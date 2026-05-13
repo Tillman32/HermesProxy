@@ -518,3 +518,6 @@ HermesProxy/profiles/*.json
 
 # Local regression-test driver
 test-loop2.ps1
+
+# MacOS
+.DS_Store
