@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC LICENSE. See LICENSE file in the project root for full license information.
 
 using Framework.Constants;
+using Framework.Logging;
 using Framework.Networking;
 using Framework.Serialization;
 using Framework.Web;
@@ -44,14 +45,21 @@ public sealed class BnetRestApiSession : SSLSocket
 
     public override void Accept()
     {
-        // Setup SSL connection
+        Log.Print(LogType.Server, $"BnetRestApiSession | Accepting connection from {GetRemoteIpEndPoint()}.");
         AsyncHandshake(BnetServerCertificate.Certificate);
     }
 
     public override async Task ReadHandler(byte[] data, int receivedLength)
     {
         var httpRequest = HttpHelper.ParseRequest(data, receivedLength);
-        if (httpRequest == null || !RequestRouter(httpRequest))
+        if (httpRequest == null)
+        {
+            Log.Print(LogType.Server, $"BnetRestApiSession | Failed to parse HTTP request from {GetRemoteIpEndPoint()}.");
+            CloseSocket();
+            return;
+        }
+        Log.Print(LogType.Server, $"BnetRestApiSession | {httpRequest.Method} {httpRequest.Path}");
+        if (!RequestRouter(httpRequest))
         {
             CloseSocket();
             return;

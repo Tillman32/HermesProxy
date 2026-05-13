@@ -75,9 +75,10 @@ public class Program
 
         var builder = Host.CreateApplicationBuilder(args);
         builder.Configuration.Sources.Clear();
+        var defaultConfigPath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         builder.Configuration
-            .AddJsonFile(configOverridePath ?? "appsettings.json", optional: false, reloadOnChange: false)
-            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false)
+            .AddJsonFile(configOverridePath ?? defaultConfigPath, optional: false, reloadOnChange: false)
+            .AddJsonFile(Path.Combine(AppContext.BaseDirectory, $"appsettings.{builder.Environment.EnvironmentName}.json"), optional: true, reloadOnChange: false)
             .AddEnvironmentVariables(prefix: "HERMES_")
             .AddCommandLine(args);
 

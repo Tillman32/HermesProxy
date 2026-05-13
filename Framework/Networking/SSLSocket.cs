@@ -71,6 +71,7 @@ public abstract class SSLSocket : ISocket, IDisposable
             var result = await _stream.ReadAsync(receiveBuffer, 0, receiveBuffer.Length);
             if (result == 0)
             {
+                Log.Print(LogType.Network, $"Connection closed by remote {_remoteEndPoint}");
                 CloseSocket();
                 return;
             }
@@ -87,7 +88,7 @@ public abstract class SSLSocket : ISocket, IDisposable
     {
         try
         {
-            await _stream.AuthenticateAsServerAsync(certificate, false, SslProtocols.Tls12, false);
+            await _stream.AuthenticateAsServerAsync(certificate, false, SslProtocols.None, false);
         }
         catch(Exception ex)
         {
@@ -96,6 +97,7 @@ public abstract class SSLSocket : ISocket, IDisposable
             return;
         }
 
+        Log.Print(LogType.Network, $"TLS handshake complete with {_remoteEndPoint} using {_stream.SslProtocol}");
         await AsyncRead();
     }
 
